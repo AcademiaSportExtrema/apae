@@ -1,0 +1,36 @@
+name: Deploy Supabase
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "supabase/**" # Simplificado para pegar qualquer mudança na pasta supabase
+      - ".github/workflows/deploy-supabase-functions.yml"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_ID }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      # Passo 1: Linkar o projeto (garante que o CLI sabe onde atuar)
+      - name: Link Supabase Project
+        run: supabase link --project-ref $PROJECT_REF
+
+      # Passo 2: (OPCIONAL) Rodar Migrations do Banco (SQL)
+      # Só descomente isso se você colocou o SQL dentro de supabase/migrations/
+      # - name: Deploy Database Changes
+      #   run: supabase db push
+
+      # Passo 3: Deploy das Functions
+      - name: Deploy Edge Functions
+        run: supabase functions deploy --force
