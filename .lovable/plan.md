@@ -1,39 +1,39 @@
 
 
-# Corrigir Erros de Build do TypeScript
+# Inserir Dados de Teste no Banco de Dados
 
-O banco de dados esta funcionando perfeitamente -- todas as 20 tabelas estao presentes e as configuracoes da BIA/APAE estao salvas. Porem, o projeto tem varios erros de TypeScript que impedem a compilacao. Vou corrigir todos eles.
+O banco de dados esta funcionando e ja tem configuracoes basicas (pipeline, equipes, tags, perfil). Porem as tabelas operacionais estao vazias. Vou popular com dados realistas para voce testar o sistema.
 
-## Resumo dos Erros
+## O que sera inserido
 
-Os erros sao todos do mesmo tipo: incompatibilidades entre valores `null` do banco de dados e tipos que esperam `undefined` ou valores nao-nulos no codigo.
+### 1. Contatos (5 registros)
+- Joao Silva, Maria Santos, Carlos Oliveira, Ana Costa, Pedro Mendes
+- Com telefones, emails, tags e datas variadas
 
-## Correcoes Planejadas
+### 2. Conversas (5 registros)
+- Uma conversa para cada contato
+- Status variados: nina, human, waiting
 
-### 1. Declaracao de tipo para canvas-confetti
-- Criar arquivo `src/canvas-confetti.d.ts` com `declare module 'canvas-confetti'`
+### 3. Mensagens (10-15 registros)
+- Mensagens de exemplo em cada conversa
+- Tipos: human (cliente) e nina (IA)
 
-### 2. ChatInterface.tsx (linha 73)
-- Corrigir `activeChat?.unreadCount > 0` para `(activeChat?.unreadCount ?? 0) > 0`
+### 4. Deals (5 registros)
+- Um deal por contato, distribuidos nos estagios do pipeline
+- Valores e prioridades variados
 
-### 3. types.ts - Ajustar tipos para aceitar `null`
-- `Team.color`: mudar para `string | null` com fallback no uso
-- `TeamFunction.is_active`: mudar para `boolean | null`  
-- `TeamMember.weight`: mudar para `number | null`
-- `Appointment.description`: mudar para `string | null`
-- `Deal.conversationId`: mudar para `string | null`
+### 5. Agendamentos (3 registros)
+- Demos, reunioes e follow-ups para os proximos dias
 
-### 4. services/api.ts - Correcoes pontuais
-- Linha 193: adicionar cast/filtro para `responseTimes` (`.filter((x): x is number => x !== null)`)
-- Linha 777: filtrar nulls do array `contactIds`
-- Linha 802: usar `|| undefined` em vez de `|| null` para `conversationId`
-- Linha 992: usar `data.stage || ''` para garantir string
-- Linha 996: usar `data.due_date || undefined`
+## Como verificar
 
-### 5. settings/AgentSettings.tsx e ApiSettings.tsx
-- Adicionar fallback `|| ''` nos argumentos que podem ser `undefined`
+Depois de inserir, voce podera:
+- Fazer login no app e ver os contatos na tela de Contatos
+- Ver os deals no Kanban
+- Ver as conversas no Chat
+- Ver os agendamentos na Agenda
 
-## Detalhes Tecnicos
+## Detalhe tecnico
 
-Todas as correcoes sao ajustes de tipo minimos -- nao alteram a logica do app, apenas alinham os tipos TypeScript com os valores retornados pelo banco de dados (que usa `null` em vez de `undefined` para campos opcionais).
+Todos os registros serao vinculados ao `user_id` existente (`19e2d7f6-9b87-49d4-883f-dac4c1f7eae9`) para garantir que as politicas de seguranca (RLS) permitam a visualizacao.
 
