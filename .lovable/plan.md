@@ -1,56 +1,33 @@
 
 
-# Exportar Dados em CSV - Menu no Sidebar
+# Adicionar Seção de Migração SQL na Tela de Exportar Dados
 
 ## Objetivo
-Adicionar um item "Exportar Dados" no sidebar que abre uma tela/modal onde o usuario pode selecionar e exportar em CSV os dados de todas as tabelas do banco de dados.
+Adicionar uma seção abaixo da exportação CSV com os scripts SQL de criação (CREATE TABLE) de todas as tabelas do sistema, permitindo copiar o SQL para migrar a estrutura em outro banco.
 
-## Tabelas disponiveis para exportacao
+## Mudanças
 
-| Tabela | Descricao |
-|--------|-----------|
-| `contacts` | Contatos |
-| `conversations` | Conversas |
-| `messages` | Mensagens |
-| `deals` | Deals/Negocios |
-| `deal_activities` | Atividades dos deals |
-| `appointments` | Agendamentos |
-| `pipeline_stages` | Estagios do pipeline |
-| `teams` | Equipes |
-| `team_members` | Membros das equipes |
-| `team_functions` | Funcoes das equipes |
-| `tag_definitions` | Definicoes de tags |
-| `nina_settings` | Configuracoes do sistema |
-| `profiles` | Perfis de usuario |
+### 1. Atualizar `src/components/ExportData.tsx`
 
-## Mudancas
+Adicionar uma nova seção "Migração SQL" abaixo do grid de tabelas CSV, contendo:
 
-### 1. Nova pagina `src/components/ExportData.tsx`
-- Tela com lista de todas as tabelas disponiveis
-- Checkbox para selecionar quais tabelas exportar
-- Botao "Exportar Selecionados" e "Exportar Todos"
-- Ao clicar, busca os dados via Supabase client e converte para CSV
-- Faz download automatico do arquivo `.csv` para cada tabela selecionada
-- Indicador de loading durante a exportacao
+- Um bloco de código com os DDL (CREATE TABLE) de todas as 13 tabelas do sistema, incluindo tipos de colunas, defaults, constraints e tipos customizados (enums)
+- Botão "Copiar SQL" que copia todo o conteúdo para a área de transferência usando `navigator.clipboard.writeText()`
+- Toast de confirmação ao copiar
+- O SQL será hardcoded como constante no componente, baseado no schema atual do banco
 
-### 2. Atualizar `src/components/Sidebar.tsx`
-- Adicionar item "Exportar Dados" com icone `Download` do lucide-react no array `menuItems`
+### Conteúdo do SQL
 
-### 3. Atualizar `src/App.tsx`
-- Adicionar rota `/export` apontando para o componente `ExportData`
-
-## Detalhes Tecnicos
-
-### Logica de exportacao CSV (client-side)
-- Funcao utilitaria que recebe um array de objetos e converte para string CSV
-- Tratamento de campos com virgulas, aspas e quebras de linha
-- Campos JSON (como `client_memory`, `metadata`) serao serializados como string JSON na celula
-- Download via `Blob` + `URL.createObjectURL` + click em link temporario
-- Consultas usam `supabase.from('tabela').select('*')` respeitando RLS
+O script incluirá:
+- Criação dos tipos ENUM (`appointment_type`, `conversation_status`, `message_type`, `message_status`, `queue_status`, `member_role`, `member_status`, `app_role`)
+- CREATE TABLE para todas as 13 tabelas com colunas, tipos, defaults e constraints
+- Comentários organizacionais separando cada tabela
 
 ### Interface
-- Design consistente com o restante do app (dark theme, slate/cyan)
-- Cards por tabela mostrando nome e quantidade de registros
-- Selecao individual ou em massa
-- Toast de sucesso/erro apos exportacao
+
+- Separador visual entre a seção CSV e a seção SQL
+- Título "Migração SQL" com ícone de código
+- Área de texto com scroll mostrando o SQL completo
+- Botão "Copiar SQL" com feedback visual
+- Design consistente com o tema escuro existente
 
