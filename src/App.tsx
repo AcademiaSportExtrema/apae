@@ -8,6 +8,7 @@ import Settings from './components/Settings';
 import Team from './components/Team';
 import Scheduling from './components/Scheduling';
 import Kanban from './components/Kanban';
+import ExportData from './components/ExportData';
 import Auth from './pages/Auth';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -77,6 +78,7 @@ const App: React.FC = () => {
               <Route path="/scheduling" element={<Scheduling />} />
               <Route path="/team" element={<Team />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/export" element={<ExportData />} />
             </Route>
             
             {/* Catch all - redirect to dashboard */}
