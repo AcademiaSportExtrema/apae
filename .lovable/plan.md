@@ -1,39 +1,56 @@
 
 
-# Inserir Dados de Teste no Banco de Dados
+# Exportar Dados em CSV - Menu no Sidebar
 
-O banco de dados esta funcionando e ja tem configuracoes basicas (pipeline, equipes, tags, perfil). Porem as tabelas operacionais estao vazias. Vou popular com dados realistas para voce testar o sistema.
+## Objetivo
+Adicionar um item "Exportar Dados" no sidebar que abre uma tela/modal onde o usuario pode selecionar e exportar em CSV os dados de todas as tabelas do banco de dados.
 
-## O que sera inserido
+## Tabelas disponiveis para exportacao
 
-### 1. Contatos (5 registros)
-- Joao Silva, Maria Santos, Carlos Oliveira, Ana Costa, Pedro Mendes
-- Com telefones, emails, tags e datas variadas
+| Tabela | Descricao |
+|--------|-----------|
+| `contacts` | Contatos |
+| `conversations` | Conversas |
+| `messages` | Mensagens |
+| `deals` | Deals/Negocios |
+| `deal_activities` | Atividades dos deals |
+| `appointments` | Agendamentos |
+| `pipeline_stages` | Estagios do pipeline |
+| `teams` | Equipes |
+| `team_members` | Membros das equipes |
+| `team_functions` | Funcoes das equipes |
+| `tag_definitions` | Definicoes de tags |
+| `nina_settings` | Configuracoes do sistema |
+| `profiles` | Perfis de usuario |
 
-### 2. Conversas (5 registros)
-- Uma conversa para cada contato
-- Status variados: nina, human, waiting
+## Mudancas
 
-### 3. Mensagens (10-15 registros)
-- Mensagens de exemplo em cada conversa
-- Tipos: human (cliente) e nina (IA)
+### 1. Nova pagina `src/components/ExportData.tsx`
+- Tela com lista de todas as tabelas disponiveis
+- Checkbox para selecionar quais tabelas exportar
+- Botao "Exportar Selecionados" e "Exportar Todos"
+- Ao clicar, busca os dados via Supabase client e converte para CSV
+- Faz download automatico do arquivo `.csv` para cada tabela selecionada
+- Indicador de loading durante a exportacao
 
-### 4. Deals (5 registros)
-- Um deal por contato, distribuidos nos estagios do pipeline
-- Valores e prioridades variados
+### 2. Atualizar `src/components/Sidebar.tsx`
+- Adicionar item "Exportar Dados" com icone `Download` do lucide-react no array `menuItems`
 
-### 5. Agendamentos (3 registros)
-- Demos, reunioes e follow-ups para os proximos dias
+### 3. Atualizar `src/App.tsx`
+- Adicionar rota `/export` apontando para o componente `ExportData`
 
-## Como verificar
+## Detalhes Tecnicos
 
-Depois de inserir, voce podera:
-- Fazer login no app e ver os contatos na tela de Contatos
-- Ver os deals no Kanban
-- Ver as conversas no Chat
-- Ver os agendamentos na Agenda
+### Logica de exportacao CSV (client-side)
+- Funcao utilitaria que recebe um array de objetos e converte para string CSV
+- Tratamento de campos com virgulas, aspas e quebras de linha
+- Campos JSON (como `client_memory`, `metadata`) serao serializados como string JSON na celula
+- Download via `Blob` + `URL.createObjectURL` + click em link temporario
+- Consultas usam `supabase.from('tabela').select('*')` respeitando RLS
 
-## Detalhe tecnico
-
-Todos os registros serao vinculados ao `user_id` existente (`19e2d7f6-9b87-49d4-883f-dac4c1f7eae9`) para garantir que as politicas de seguranca (RLS) permitam a visualizacao.
+### Interface
+- Design consistente com o restante do app (dark theme, slate/cyan)
+- Cards por tabela mostrando nome e quantidade de registros
+- Selecao individual ou em massa
+- Toast de sucesso/erro apos exportacao
 
